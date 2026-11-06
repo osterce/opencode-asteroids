@@ -15,7 +15,7 @@ Verify changes by opening `index.html` directly in a browser, or `npx serve .` a
 - Input splits into held state (`keys`) and consumed one-shot presses (`justPressed` + `pressed()`). Use `pressed()` for actions that must fire once, such as shooting and restart.
 - Game states are `playing | dead | gameover`; timers (`deadTimer`, `ship.invincible`, `ship.speedTimer`, cooldowns) are in seconds and decremented by `dt`. The loop clamps `dt` to 0.05s.
 - Destroying any asteroid has a 15% chance to drop a `PowerUp` (max 2 on screen). Collecting it sets `ship.speedTimer = 5`, which doubles `THRUST` only. Timer is cleared by `Ship.reset()`, so the boost is lost on death or level change.
-- The README's "estrella fugaz" asteroid is still not implemented. Current entities are `Ship`, `Bullet`, `Asteroid`, `PowerUp`, and `Particle`.
+- `Asteroid` takes an optional `opts` argument. `{ streak: true }` creates a "estrella fugaz": size 1, 3x speed, `ttl` of 7–10s, no splitting, cyan trail and blinking before it expires. `spawnStreak()` keeps at most one alive and spawns it from a side edge when `streakTimer` reaches 0; that timer is reset in `initGame()` and `nextLevel()`. It counts toward level completion, so if it is the last asteroid the level waits for it to expire. Current entities are `Ship`, `Bullet`, `Asteroid`, `PowerUp`, and `Particle`.
 
 ## Conventions
 
