@@ -29,6 +29,7 @@ Luego visita `http://localhost:3000`.
 | `←` `→`   | Rotar nave |
 | `↑`       | Propulsar  |
 | `Espacio` | Disparar   |
+| `S`       | Cambiar skin |
 
 ## Puntuación
 
@@ -50,6 +51,19 @@ De vez en cuando aparece desde un borde de la pantalla una estrella fugaz: un as
 | ⚡ Velocidad | Duplica la velocidad de la nave durante 5 segundos            |
 
 Al destruir un asteroide hay un 15% de probabilidad de que suelte un rayo de Velocidad. Se recoge pasando por encima con la nave, desaparece a los 10 segundos si no se recoge y puede haber como máximo dos activos a la vez. Recoger otro mientras el efecto está activo reinicia el contador a 5 segundos.
+
+## Skins
+
+La nave tiene cuatro apariencias vectoriales:
+
+| Skin     | Color   | Estilo                        |
+| -------- | ------- | ----------------------------- |
+| Clásica  | Blanco  | Triángulo con muesca trasera  |
+| Caza     | Ámbar   | Alas en flecha                |
+| Delta    | Cian    | Punta afilada con aletas      |
+| Espectro | Magenta | Perfil angular                |
+
+Pulsa `S` durante la partida para cambiar de skin (también funciona en la pantalla de GAME OVER). La elección se guarda en `localStorage` y se conserva al recargar. Los iconos de vidas y la llama del propulsor usan la skin activa.
 
 ## Características
 
