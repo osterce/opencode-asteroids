@@ -30,6 +30,7 @@ Luego visita `http://localhost:3000`.
 | `↑`       | Propulsar      |
 | `Espacio` | Disparar       |
 | `S`       | Activar escudo |
+| `K`       | Cambiar skin   |
 
 ## Puntuación
 
@@ -58,6 +59,19 @@ Al destruir un asteroide hay un 15% de probabilidad de que suelte un power-up, e
 Pulsa `S` para activar un escudo cian alrededor de la nave. Dura 8 segundos y, mientras esté activo, absorbe cualquier impacto con un asteroide (también con la estrella fugaz): el asteroide rebota y se separa sin destruirse ni otorgar puntos. Al agotarse, el escudo tarda 10 segundos en recargarse. Se pierde al morir o al cambiar de nivel.
 
 El HUD muestra `ESCUDO [S]` cuando está listo, la cuenta atrás mientras está activo y el tiempo restante de recarga.
+
+## Skins
+
+La nave tiene cuatro apariencias vectoriales:
+
+| Skin     | Color   | Estilo                        |
+| -------- | ------- | ----------------------------- |
+| Clásica  | Blanco  | Triángulo con muesca trasera  |
+| Caza     | Ámbar   | Alas en flecha                |
+| Delta    | Cian    | Punta afilada con aletas      |
+| Espectro | Magenta | Perfil angular                |
+
+Pulsa `K` durante la partida para cambiar de skin (también funciona en la pantalla de GAME OVER). La elección se guarda en `localStorage` y se conserva al recargar. Los iconos de vidas y la llama del propulsor usan la skin activa.
 
 ## Características
 
