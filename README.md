@@ -4,7 +4,7 @@ Clon del clásico arcade **Asteroids** implementado en canvas HTML5 puro, sin de
 
 ## Descripción
 
-Nave espacial en un campo de asteroides con envolvimiento de bordes (el espacio es toroidal). Destruye asteroides para sumar puntos: los grandes se parten en medianos, los medianos en pequeños. Incluye el power-up **Velocidad**, que duplica temporalmente la velocidad de la nave, y la **estrella fugaz**, un asteroide veloz que desaparece con el tiempo.
+Nave espacial en un campo de asteroides con envolvimiento de bordes (el espacio es toroidal). Destruye asteroides para sumar puntos: los grandes se parten en medianos, los medianos en pequeños. Incluye los power-ups **Velocidad**, que duplica temporalmente la velocidad de la nave, y **Triple Shot**, que dispara tres balas en abanico, además de la **estrella fugaz**, un asteroide veloz que desaparece con el tiempo.
 
 ## Tecnologías
 
@@ -45,11 +45,12 @@ De vez en cuando aparece desde un borde de la pantalla una estrella fugaz: un as
 
 ## Power-ups
 
-| Power-up    | Efecto                                                        |
-| ----------- | ------------------------------------------------------------- |
-| ⚡ Velocidad | Duplica la velocidad de la nave durante 5 segundos            |
+| Power-up     | Efecto                                                              |
+| ------------ | ------------------------------------------------------------------- |
+| ⚡ Velocidad  | Duplica la velocidad de la nave durante 5 segundos                  |
+| 🔱 Triple Shot | Dispara 3 balas en abanico durante 5 segundos                      |
 
-Al destruir un asteroide hay un 15% de probabilidad de que suelte un rayo de Velocidad. Se recoge pasando por encima con la nave, desaparece a los 10 segundos si no se recoge y puede haber como máximo dos activos a la vez. Recoger otro mientras el efecto está activo reinicia el contador a 5 segundos.
+Al destruir un asteroide hay un 15% de probabilidad de que suelte un power-up, elegido al 50% entre Velocidad (amarillo) y Triple Shot (cian). Se recoge pasando por encima con la nave, desaparece a los 10 segundos si no se recoge y puede haber como máximo dos activos a la vez. Recoger otro mientras el efecto está activo reinicia el contador a 5 segundos. Ambos efectos pueden estar activos a la vez y sus contadores son independientes.
 
 ## Características
 
@@ -57,4 +58,5 @@ Al destruir un asteroide hay un 15% de probabilidad de que suelte un rayo de Vel
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Power-up Velocidad: duplica el empuje de la nave durante 5 segundos
+- Power-up Triple Shot: dispara 3 balas en abanico durante 5 segundos
 - Estrella fugaz: asteroide veloz y temporal que no se divide
