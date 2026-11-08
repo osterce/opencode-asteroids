@@ -210,6 +210,9 @@ class Ship {
     this.invincible    = 3;
     this.shootCooldown = 0;
     this.speedTimer    = 0;
+    this.shieldTimer    = 0;
+    this.shieldCooldown = 0;
+    this.shieldFlash    = 0;
     this.dead          = false;
   }
 
@@ -218,6 +221,18 @@ class Ship {
     if (this.invincible    > 0) this.invincible    -= dt;
     if (this.shootCooldown > 0) this.shootCooldown -= dt;
     if (this.speedTimer    > 0) this.speedTimer    -= dt;
+    if (this.shieldFlash   > 0) this.shieldFlash   -= dt;
+
+    if (this.shieldTimer > 0) {
+      this.shieldTimer -= dt;
+      if (this.shieldTimer <= 0) {
+        this.shieldTimer    = 0;
+        this.shieldCooldown = 10;
+      }
+    } else if (this.shieldCooldown > 0) {
+      this.shieldCooldown -= dt;
+      if (this.shieldCooldown < 0) this.shieldCooldown = 0;
+    }
 
     const ROT    = 3.5;                                  // rad/s
     const THRUST = 260 * (this.speedTimer > 0 ? 2 : 1);  // px/s² (x2 con Velocidad)
@@ -245,6 +260,12 @@ class Ship {
     const ox = this.x + Math.cos(this.angle) * NOSE;
     const oy = this.y + Math.sin(this.angle) * NOSE;
     return [new Bullet(ox, oy, this.angle)];
+  }
+
+  activateShield() {
+    if (this.dead || this.shieldTimer > 0 || this.shieldCooldown > 0) return;
+    this.shieldTimer = 8;
+    this.shieldFlash = 0;
   }
 
   draw() {
@@ -280,6 +301,45 @@ class Ship {
         : 'rgba(255, 130, 0, 0.85)';
       ctx.stroke();
     }
+
+    ctx.restore();
+  }
+
+  // Se dibuja aparte de draw() para no parpadear con la invencibilidad
+  drawShield() {
+    if (this.dead || this.shieldTimer <= 0) return;
+
+    const R     = 24;
+    const flash = this.shieldFlash > 0;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    // Anillo exterior
+    ctx.strokeStyle = flash
+      ? 'rgba(190, 245, 255, 0.95)'
+      : 'rgba(92, 216, 255, 0.55)';
+    ctx.lineWidth = flash ? 3 : 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, R, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Hexágono giratorio
+    ctx.rotate(this.shieldTimer * 0.6);
+    ctx.strokeStyle = flash
+      ? 'rgba(190, 245, 255, 0.9)'
+      : 'rgba(92, 216, 255, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a  = (i / 6) * Math.PI * 2;
+      const px = Math.cos(a) * R;
+      const py = Math.sin(a) * R;
+      if (i === 0) ctx.moveTo(px, py);
+      else         ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
 
     ctx.restore();
   }
@@ -389,12 +449,14 @@ function killShip() {
 function update(dt) {
   if (state === 'gameover') {
     if (pressed('Space')) initGame();
+    pressed('KeyS'); // descarta pulsaciones mientras el juego está terminado
     particles.forEach(p => p.update(dt));
     particles = particles.filter(p => !p.dead);
     return;
   }
 
   if (state === 'dead') {
+    pressed('KeyS'); // descarta pulsaciones mientras la nave está destruida
     deadTimer -= dt;
     particles.forEach(p => p.update(dt));
     particles = particles.filter(p => !p.dead);
@@ -407,6 +469,9 @@ function update(dt) {
   if (pressed('Space')) {
     bullets.push(...ship.tryShoot());
   }
+
+  // Escudo
+  if (pressed('KeyS')) ship.activateShield();
 
   // Estrella fugaz
   streakTimer -= dt;
@@ -457,7 +522,28 @@ function update(dt) {
   if (ship.invincible <= 0) {
     for (const a of asteroids) {
       if (dist(ship, a) < ship.radius + a.radius * 0.82) {
-        killShip();
+        if (ship.shieldTimer > 0) {
+          // El escudo absorbe el impacto y empuja el asteroide hacia fuera
+          let dx  = a.x - ship.x;
+          let dy  = a.y - ship.y;
+          let len = Math.hypot(dx, dy);
+          if (len < 0.001) {
+            const ang = rand(0, Math.PI * 2);
+            dx  = Math.cos(ang);
+            dy  = Math.sin(ang);
+            len = 1;
+          }
+          const speed = Math.max(Math.hypot(a.vx, a.vy), 140);
+          a.vx = (dx / len) * speed;
+          a.vy = (dy / len) * speed;
+          const gap = ship.radius + a.radius * 0.82 + 2;
+          a.x = wrap(ship.x + (dx / len) * gap, W);
+          a.y = wrap(ship.y + (dy / len) * gap, H);
+          ship.shieldFlash = 0.25;
+          explode(a.x, a.y, 4);
+        } else {
+          killShip();
+        }
         break;
       }
     }
@@ -498,6 +584,20 @@ function drawHUD() {
     ctx.fillStyle = '#fff';
   }
 
+  if (state === 'playing') {
+    if (ship.shieldTimer > 0) {
+      ctx.fillStyle = '#5cd8ff';
+      ctx.fillText(`ESCUDO ${ship.shieldTimer.toFixed(1)}s`, 14, 70);
+    } else if (ship.shieldCooldown > 0) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillText(`ESCUDO ${ship.shieldCooldown.toFixed(1)}s`, 14, 70);
+    } else {
+      ctx.fillStyle = 'rgba(92, 216, 255, 0.65)';
+      ctx.fillText('ESCUDO [S]', 14, 70);
+    }
+    ctx.fillStyle = '#fff';
+  }
+
   ctx.textAlign = 'center';
   ctx.fillText(`NIVEL ${level}`, W / 2, 26);
 
@@ -525,6 +625,7 @@ function draw() {
   powerUps.forEach(p => p.draw());
   bullets.forEach(b => b.draw());
   ship.draw();
+  ship.drawShield();
 
   drawHUD();
 
